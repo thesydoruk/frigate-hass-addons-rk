@@ -1,10 +1,11 @@
-name: Frigate (For old x86_64 CPU without AVX)
-version: 0.14.1
+name: Frigate Rockchip (Full Access)
+version: fd96cd5-rk
 panel_icon: "mdi:cctv"
 panel_title: Frigate
-slug: frigate-oldcpu
+slug: frigate-fa-rk
 description: NVR with realtime local object detection for IP cameras
 url: "https://github.com/blakeblackshear/frigate"
+image: ghcr.io/blakeblackshear/frigate
 startup: application
 boot: auto
 init: false
@@ -20,6 +21,7 @@ ports:
   8555/tcp: 8555
   8555/udp: 8555
   8554/tcp: null
+  8971/tcp: null
   5000/tcp: null
   1984/tcp: null
   1935/tcp: null
@@ -27,34 +29,26 @@ ports_description:
   8555/tcp: WebRTC over tcp
   8555/udp: WebRTC over udp
   8554/tcp: RTSP Restream
-  5000/tcp: Web interface (not required for Home Assistant Ingress)
+  8971/tcp: Authenticated Web interface
+  5000/tcp: Unauthenticated Web interface (not required for Home Assistant Ingress)
   1984/tcp: go2rtc API
 host_network: false
-devices:
-  - /dev/dri/renderD128
-  - /dev/apex_0
-  - /dev/apex_1
-  - /dev/apex_2
-  - /dev/apex_3
-  - /dev/dri/card0
-  - /dev/vchiq
-  - /dev/video10
-  - /dev/video0
+tmpfs: true
 usb: true
 video: true
-tmpfs: true
-full_access: false
+full_access: true
 privileged:
-  - SYS_ADMIN
-environment:
-  CONFIG_FILE: /config/frigate.yml
+  - PERFMON
 schema:
   plus_api_key: password?
 services:
   - "mqtt:want"
 arch:
   - amd64
+  - aarch64
 map:
   - "media:rw"
-  - "config:rw"
   - "ssl"
+  - "addon_config:rw"
+  # Mount old config dir to be migrated by the image
+  - "homeassistant_config:rw"
